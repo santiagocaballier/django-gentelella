@@ -1,4 +1,4 @@
-/**
+/*/**
  * Resize function without multiple trigger
  *
  * Usage:
@@ -2756,10 +2756,10 @@ function init_morris_charts() {
         Morris.Donut({
             element: 'graph_donut',
             data: [
-                { label: 'Jam', value: 25 },
-                { label: 'Frosted', value: 40 },
-                { label: 'Custard', value: 25 },
-                { label: 'Sugar', value: 10 }
+                { label: 'Jam', value: 45 },
+                { label: 'Frosted', value: 20 },
+                { label: 'Custard', value: 15 },
+                { label: 'Sugar', value: 20 }
             ],
             colors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
             formatter: function(y) {

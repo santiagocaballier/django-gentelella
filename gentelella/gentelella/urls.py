@@ -19,8 +19,9 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
+    url(r'^sensor/', include('sensor.urls')),
     # app/ -> Genetelella UI and resources
     url(r'^app/', include('app.urls')),
     url(r'^', include('app.urls')),
-
+    
 ]
