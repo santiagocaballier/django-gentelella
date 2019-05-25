@@ -17,12 +17,16 @@ def set_data(request,_mac_address,_dataint,_datadec):
     
     qsensor = Sensor.objects.filter(mac_address=_mac_address)
     if qsensor:
-        sensor = qsensor[0] 
+        _sensor = qsensor[0] 
+        
+        qalarma = Alarma.objects.get(sensor=_sensor)
     
         dsen = DataSensor()
         dsen.data = float(str(_dataint) + '.' + str(_datadec))
         dsen.datetime = datetime.now()
-        dsen.sensor = sensor    
+        dsen.sensor = _sensor
+        if qalarma:
+            dsen.alarma_value = qalarma.valor
         
         dsen.save()
         print(dsen)
@@ -30,25 +34,29 @@ def set_data(request,_mac_address,_dataint,_datadec):
         
     return HttpResponse(result)
 
-def test(request,_username):
-    goal = []
-    goal.append(randint(5,30))
-    
-    return HttpResponse(goal)
 
 def refresh_graph(request,_sensor_name):
     graph_data = {} 
     sensor = Sensor.objects.get(nombre=_sensor_name)
     
-    start_date = request.GET['start_date']
-    end_date = request.GET['end_date']  
+    
+    if request.GET['start_date']:
+        start_date = request.GET['start_date']
+    else:
+        start_date = datetime.now().strftime("%Y-%m-%d 00:00")
+    
+    if request.GET['end_date']: 
+        end_date = request.GET['end_date']
+    else:
+        end_date = datetime.now().strftime("%Y-%m-%d 23:59")
+    
     
     #Data
     dq = DataSensor.objects.filter(sensor = sensor, datetime__range=(start_date, end_date))
     obj = []
     if dq:
         for d in dq:
-            data = {"datetime" : str(d.datetime.date()) + ' ' + str(d.datetime.time()),"value" : str(d.data)}
+            data = {"datetime" : str(d.datetime.date()) + ' ' + str(d.datetime.time()) , "value" : str(d.data) , "alarma": str(d.alarma_value)}
             obj.append(data)
     else:
         data = {}

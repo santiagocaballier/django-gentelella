@@ -48,11 +48,10 @@
         <div class="x_panel">          
           <ul class="nav nav-pills" role="tablist">
               <li role="presentation" class="dropdown">
-                <a id="drop_sensores" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
-                    <div id="drop_sensores_text"> Seleccione una ubicación</div> 
-                    <span class="caret"></span>
+                <a id="drop_ubicaciones" class="dropdown-toggle btn btn-default" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
+                    <span id="drop_ubicaciones_text"> Seleccione una ubicación</span> <span class="caret"></span>
                 </a>
-                <ul id="drop_sensores_menu" class="dropdown-menu animated fadeInDown" role="menu" aria-labelledby="drop5">
+                <ul id="drop_ubicaciones_menu" class="dropdown-menu animated fadeInDown" role="menu" aria-labelledby="drop5">
                   {% for item in combo_ubicacion %}
                         <li role="presentation">
                             <a id="{{ item }}" role="menuitem" tabindex="-1" href="#">
@@ -69,7 +68,7 @@
                     <fieldset>
                         <div class="input-prepend input-group">
                             <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
-                            <input type="text" name="reservation-time" id="graph_time" class="form-control text-center pull-left"/>
+                            <input type="text" name="reservation-time" id="table_time" class="form-control text-center pull-left"/>
                         </div>
                     </fieldset>
                 </form>
@@ -78,8 +77,8 @@
           </div >
         
         
-        <!-- graph area -->
-        <div id="graph_panel" class="col-md-12 col-sm-12 col-xs-12">
+        <!-- table area -->
+        <div id="table_panel" class="col-md-12 col-sm-12 col-xs-12">
           <div class="x_panel">
             <div class="x_title">
               <h2> Validacion: <small> </small></h2>
@@ -87,23 +86,66 @@
             
                 <li class="dropdown">
             
-                  <i id="graph_refresh" class="fa fa-refresh"></i></a>
+                  <i id="table_refresh" class="fa fa-refresh"></i></a>
                   
                 </li>
               </ul>
               <div class="clearfix"></div>
             </div>
-            <div class="x_content2">
-
-            <div id="graph_sensor" style="width:100%; height:400px;"></div>
+            
+            <div class="x_content">
+              <table id="table_ubicacion" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Calidad de aire</th>
+                    <th>Temperatura</th>
+                    <th>Luminosidad</th>
+                    <th>Intensidad sonora</th>
+                    <th>Factor de cumplimiento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">1</th>
+                    <td>Dato 1</td>
+                    <td>Dato 2</td>
+                    <td>Dato 3</td>
+                    <td>Dato 4</td>
+                    <td>0%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2</th>
+                    <td>Dato 1</td>
+                    <td>Dato 2</td>
+                    <td>Dato 3</td>
+                    <td>Dato 4</td>
+                    <td>0%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">3</th>
+                    <td>Dato 1</td>
+                    <td>Dato 2</td>
+                    <td>Dato 3</td>
+                    <td>Dato 4</td>
+                    <td>0%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">4</th>
+                    <td>Dato 1</td>
+                    <td>Dato 2</td>
+                    <td>Dato 3</td>
+                    <td>Dato 4</td>
+                    <td>0%</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <!--<h2><small id = "data_sel"> Seleccione un valor para mas detalles </small></h2>-->
-            <h2><small id = "data_detail"> Seleccione un valor para mas detalles </small></h2>
           </div>
         </div>
         
-        <div id="graph_status">
-          Seleccione un sensor. 
+        <div id="ubicacion_status">
+          Seleccione una ubicación. 
         </div>
         <!-- /graph area -->
         
@@ -140,35 +182,11 @@
       <script src="/static/vendors/morris.js/morris.min.js"></script>
       
       <script>
-        /*var sensor_name = "";
+        var ubicacion_name = "";
         var start_date = "";
         var end_date = "";
 
-        var graph = Morris.Area({
-            element: 'graph_sensor',
-            data : [],
-            xkey: 'datetime',
-            ykeys: ['value'],
-            lineColors: ['#26B99A'],
-            labels: ['Valor'],
-            pointSize: 1,
-            hideHover: 'auto',
-            resize: false,
-            fillOpacity: 0.2,
-            goals: [],
-            goalStrokeWidth: 5,
-            hoverCallback: function(index, options, content, row) {
-                $('#data_detail').text('Valor: ' + options.data[index].value + ' - ' + options.data[index].datetime);
-            },
-            rangeSelect: function(range) {
-                var start = new Date(range.start).toLocaleString(),
-                    end = new Date(range.end).toLocaleString();
-
-            },
-        });
-
-
-        function graph_refresh() {
+        /*function table_refresh() {
                 var _url = "http://192.168.2.2:8000/sensor/refresh_graph/" + sensor_name + "/";
                 
                 $.ajax({
@@ -194,20 +212,16 @@
                     }
                   }
                 });
-        }
+        }*/
         
-        $("#drop_sensores_menu li a").click(function() {
-            sensor_name = this.id.toString();
-            $("#drop_sensores_text").text(sensor_name);
-            graph_refresh();
-        });
-        
-        $("#graph_refresh").click(function() {
-            graph_refresh();
+        $("#drop_ubicaciones_menu li a").click(function() {
+            ubicacion_name = this.id.toString();
+            $("#drop_ubicaciones_text").text(ubicacion_name);
+            /*graph_refresh();*/
         });
 
         $(function() {
-            $('#graph_time').daterangepicker({
+            $('#table_time').daterangepicker({
                 timePicker: true,
                 timePickerIncrement: 1,
                 locale: {
@@ -225,9 +239,9 @@
                 start_date = start.format('YYYY-MM-DD HH:mm');
                 end_date   = end.format('YYYY-MM-DD HH:mm');
 
-                graph_refresh();            
+                /*table_refresh();*/            
             });
-        });*/
+        });
       </script>
 
     {% endblock javascripts %}

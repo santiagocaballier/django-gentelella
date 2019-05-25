@@ -48,9 +48,8 @@
         <div class="x_panel">          
           <ul class="nav nav-pills" role="tablist">
               <li role="presentation" class="dropdown">
-                <a id="drop_sensores" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
-                    <div id="drop_sensores_text"> Seleccione un sensor</div> 
-                    <span class="caret"></span>
+                <a id="drop_sensores" class="dropdown-toggle btn btn-default" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false">
+                    <span id="drop_sensores_text"> Seleccione un sensor</span> <span class="caret"></span> 
                 </a>
                 <ul id="drop_sensores_menu" class="dropdown-menu animated fadeInDown" role="menu" aria-labelledby="drop5">
                   {% for item in combo_sensor %}
@@ -98,7 +97,7 @@
             <div id="graph_sensor" style="width:100%; height:400px;"></div>
             </div>
             <!--<h2><small id = "data_sel"> Seleccione un valor para mas detalles </small></h2>-->
-            <h2><small id = "data_detail"> Seleccione un valor para mas detalles </small></h2>
+            <!--<h2><small id = "data_detail"> Seleccione un valor para mas detalles </small></h2>-->
           </div>
         </div>
         
@@ -143,23 +142,25 @@
         var sensor_name = "";
         var start_date = "";
         var end_date = "";
-
-        var graph = Morris.Area({
+        
+        var graph = Morris.Line({
             element: 'graph_sensor',
             data : [],
             xkey: 'datetime',
-            ykeys: ['value'],
-            lineColors: ['#26B99A'],
-            labels: ['Valor'],
+            ykeys: ['value','alarma'],
+            lineColors: ['#26B99A','#FF6666'],
+            labels: ['Valor','Alarma'],
             pointSize: 1,
             hideHover: 'auto',
-            resize: false,
-            fillOpacity: 0.2,
+            continuousLine: false,
+            resize: true,
+            fillOpacity: 0.4,
             goals: [],
-            goalStrokeWidth: 5,
-            hoverCallback: function(index, options, content, row) {
-                $('#data_detail').text('Valor: ' + options.data[index].value + ' - ' + options.data[index].datetime);
-            },
+            goalStrokeWidth: 1,
+            
+            /*hoverCallback: function(index, options, content, row) {
+                $('#data_detail').text('Valor: ' + options.data[index].value + ' - Alarma: ' + options.data[index].alarma + ' - ' + options.data[index].datetime);
+            },*/
             rangeSelect: function(range) {
                 var start = new Date(range.start).toLocaleString(),
                     end = new Date(range.end).toLocaleString();
@@ -169,7 +170,7 @@
 
 
         function graph_refresh() {
-                var _url = "http://192.168.2.2:8000/sensor/refresh_graph/" + sensor_name + "/";
+                var _url = "/sensor/refresh_graph/" + sensor_name + "/";
                 
                 $.ajax({
                   url: _url,
@@ -179,7 +180,7 @@
                      },
                   success: function(r) {
                     var rdata = JSON.parse(r);
-                    //console.log(rdata);
+                    console.log(rdata);
                     
                     $("#graph_panel").hide();
                     $("#graph_status").text("Cargando información...")
@@ -228,6 +229,7 @@
                 graph_refresh();            
             });
         });
+        
       </script>
 
     {% endblock javascripts %}

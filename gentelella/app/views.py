@@ -11,13 +11,12 @@ from sensor.models import *
 
 #Esta vsta ataja la url '/' (vacia)
 def index(request):
-    context = {'username':request.user.get_full_name()}
+    context = {'username':''}
     template = loader.get_template('app/index.html')
     return HttpResponse(template.render(context, request))
 
-
 def gentelella_html(request):
-    context = {'username':request.user.get_full_name()}
+    context = {'username':request.user.username}
     # The template to be loaded as per gentelella.
     # All resource paths for gentelella end in .html.
     load_template = request.path.split('/')[-1]
@@ -57,7 +56,7 @@ def dash_sensor(request):
     ce = Empresa.objects.filter(usuario__username = request.user.username)
     combo_empresa = ce
 
-    context = {'username':request.user.get_full_name(),'combo_sensor' : combo_sensor,'combo_empresa' : combo_empresa}
+    context = {'username':request.user.username,'combo_sensor' : combo_sensor,'combo_empresa' : combo_empresa}
     load_template = request.path.split('/')[-1]
     template = loader.get_template('app/' + load_template)
     return HttpResponse(template.render(context, request))
@@ -71,7 +70,7 @@ def dash_ubicacion(request):
     ce = Empresa.objects.filter(usuario__username = request.user.username)
     combo_empresa = ce
 
-    context = {'username':request.user.get_full_name(),'combo_ubicacion' : combo_ubicacion,'combo_empresa' : combo_empresa}
+    context = {'username':request.user.username,'combo_ubicacion' : combo_ubicacion,'combo_empresa' : combo_empresa}
     load_template = request.path.split('/')[-1]
     template = loader.get_template('app/' + load_template)
     return HttpResponse(template.render(context, request))
