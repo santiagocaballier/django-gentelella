@@ -11,13 +11,13 @@ from sensor.models import *
 
 #Esta vsta ataja la url '/' (vacia)
 def index(request):
-    context = {'username':request.user.username}
+    context = {'username':request.user.get_full_name()}
     template = loader.get_template('app/index.html')
     return HttpResponse(template.render(context, request))
 
 
 def gentelella_html(request):
-    context = {'username':request.user.username}
+    context = {'username':request.user.get_full_name()}
     # The template to be loaded as per gentelella.
     # All resource paths for gentelella end in .html.
     load_template = request.path.split('/')[-1]
