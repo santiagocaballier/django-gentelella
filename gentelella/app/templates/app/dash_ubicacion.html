@@ -186,8 +186,8 @@
         var start_date = "";
         var end_date = "";
 
-        /*function table_refresh() {
-                var _url = "http://192.168.2.2:8000/sensor/refresh_graph/" + sensor_name + "/";
+        function table_refresh() {
+                var _url = "/sensor/refresh_ubicacion/" + ubicacion_name + "/";
                 
                 $.ajax({
                   url: _url,
@@ -197,27 +197,16 @@
                      },
                   success: function(r) {
                     var rdata = JSON.parse(r);
-                    //console.log(rdata);
-                    
-                    $("#graph_panel").hide();
-                    $("#graph_status").text("Cargando información...")
-                    if(rdata.data.length > 0){
-                        $("#graph_panel").show();
-                        graph.setData(rdata.data);
-                        graph.options.goals = [rdata.goals];
-                        graph.redraw();
-                        $("#graph_status").text("")
-                    } else {
-                        $("#graph_status").text("Sin datos para su selección")
-                    }
+                    console.log(rdata);
+
                   }
                 });
-        }*/
+        }
         
         $("#drop_ubicaciones_menu li a").click(function() {
             ubicacion_name = this.id.toString();
             $("#drop_ubicaciones_text").text(ubicacion_name);
-            /*graph_refresh();*/
+            table_refresh();
         });
 
         $(function() {
