@@ -93,38 +93,86 @@ def refresh_ubicacion(request,_ubicacion_name):
     '''
     #    Calidad de aire    Temperatura    Luminosidad    Intensidad sonora    Factor de cumplimiento
     1    Dato 1    Dato 2    Dato 3    Dato 4    0%
-    2    Dato 1    Dato 2    Dato 3    Dato 4    0%
-    3    Dato 1    Dato 2    Dato 3    Dato 4    0%
-    4    Dato 1    Dato 2    Dato 3    Dato 4    0%
-    
+
+              Sonido
+              Aire
+              Luminosidad
+              Temperatura
+              
+              <tr>
+                <th scope="row">1</th>
+                <td id = "td_aire">Dato 1</td>
+                <td id = "td_temp">Dato 2</td>
+                <td id = "td_lumi">Dato 3</td>
+                <td id = "td_sono">Dato 4</td>
+                <td id = "td_cumplimiento">0%</td>
+              </tr>
     '''
-    
 
     jssensores = {}
+    obj_datos = []
+
     #Obtengo los sensores
     dqsensor = Sensor.objects.filter(ubicacion__nombre = _ubicacion_name)
-    obj_sensores = []
+        
     if dqsensor:
         for s in dqsensor:
-            datas = {"sensor" : s.nombre, "tipo" : s.tipo.tipo}
+            count_total = 0.00
+            count_invalid = 0.00
             
-            #datad = {"datetime" : "01/01/1900","value" : "12"}
             dq = DataSensor.objects.filter(sensor = s, datetime__range=(start_date, end_date))
-            obj_data = []
+
             if dq:
                 for d in dq:
-                    datad = {"datetime" : str(d.datetime.date()) + ' ' + str(d.datetime.time()) , "value" : str(d.data) , "alarma": str(d.alarma_value)}
-                    obj_data.append(datad)
-            else:
-                datad = {}
+                    count_total += 1
+                    if d.data < d.alarma_value:
+                        count_invalid +=1
    
+            cumplimiento = 0
+            cumplimiento_texto = 'SIN DATOS'
             
-            datas = {"sensor" : s.nombre, "tipo" : s.tipo.tipo ,"data":obj_data}
-            obj_sensores.append(datas)
-    else:
-        datas = {}
+            if count_total > 0:
+                cumplimiento = (1 -(count_invalid / count_total)) * 100
+                if count_invalid > 0:
+                    cumplimiento_texto = 'NO CUMPLE'
+                else:
+                    cumplimiento_texto = 'CUMPLE'
+            
+            
+            data_sonido = {}
+            data_aire = {}
+            data_luminosidad = {}
+            data_temperatura = {}
+            
+            if s.tipo.tipo == "Sonido":
+                data_sonido = {"tipo" : "Sonido" , "cumplimiento" : cumplimiento,"cumplimiento_texto":cumplimiento_texto}
+                print(count_total)
+                print(data_sonido)
+                obj_datos.append(data_sonido)
+                
+            if s.tipo.tipo == "Aire":
+                data_aire  = {"tipo" : "Aire" , "cumplimiento" : cumplimiento,"cumplimiento_texto":cumplimiento_texto}
+                print(cumplimiento_texto)
+                print(data_aire)
+                obj_datos.append(data_aire)
+            
+            if s.tipo.tipo  == "Luminosidad":
+                data_luminosidad = {"tipo" : "Luminosidad" , "cumplimiento" : cumplimiento,"cumplimiento_texto":cumplimiento_texto}
+                print(count_total)
+                print(data_luminosidad)
+                obj_datos.append(data_luminosidad)
+                
+            if s.tipo.tipo  == "Temperatura":
+                data_temperatura = {"tipo" : "Temperatura" , "cumplimiento" : cumplimiento,"cumplimiento_texto":cumplimiento_texto}
+                print(count_total)
+                print(data_temperatura)
+                obj_datos.append(data_temperatura)
+            
+            #datas = {"sensor" : s.nombre, "tipo" : s.tipo.tipo ,"data":obj_data,"cumplimiento" : cumplimiento ,"cumplimiento_texto" : cumplimiento_texto, "total_muestras" : count_total}
+            #obj_sensores.append(datas)
+                         
     
-    jssensores.update({"sensores" : obj_sensores})
+    jssensores.update({"table_ubicacion" : obj_datos})
     
     #Json    
     table_data = json.dumps(jssensores)

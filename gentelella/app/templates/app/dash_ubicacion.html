@@ -107,36 +107,20 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <th scope="row">1</th>
-                    <td>Dato 1</td>
-                    <td>Dato 2</td>
-                    <td>Dato 3</td>
-                    <td>Dato 4</td>
-                    <td>0%</td>
+                    <th scope="row">Datos</th>
+                    <td id = "td_data_aire"></td>
+                    <td id = "td_data_temp"></td>
+                    <td id = "td_data_lumi"></td>
+                    <td id = "td_data_sono"></td>
+                    <td id = "td_data_cumplimiento">0%</td>
                   </tr>
                   <tr>
-                    <th scope="row">2</th>
-                    <td>Dato 1</td>
-                    <td>Dato 2</td>
-                    <td>Dato 3</td>
-                    <td>Dato 4</td>
-                    <td>0%</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">3</th>
-                    <td>Dato 1</td>
-                    <td>Dato 2</td>
-                    <td>Dato 3</td>
-                    <td>Dato 4</td>
-                    <td>0%</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">4</th>
-                    <td>Dato 1</td>
-                    <td>Dato 2</td>
-                    <td>Dato 3</td>
-                    <td>Dato 4</td>
-                    <td>0%</td>
+                    <th scope="row">Cumplimiento</th>
+                    <td id="td_texto_aire">SIN DATOS</td>
+                    <td id="td_texto_temp">SIN DATOS</td>
+                    <td id="td_texto_lumi">SIN DATOS</td>
+                    <td id="td_texto_sono">SIN DATOS</td>
+                    <td id="td_texto_cumplimiento">-</td>
                   </tr>
                 </tbody>
               </table>
@@ -197,7 +181,60 @@
                      },
                   success: function(r) {
                     var rdata = JSON.parse(r);
-                    console.log(rdata);
+                    //console.log(rdata);
+                    
+                    
+                    
+                    for(var i=0;i<rdata.table_ubicacion.length;i++){
+                        console.log("dato por ubicacion")
+                        console.log(rdata.table_ubicacion[i].tipo)
+                        console.log(rdata.table_ubicacion[i].cumplimiento)
+                        console.log(rdata.table_ubicacion[i].cumplimiento_texto)
+                        
+                        /*Sonido
+                        Aire
+                        Luminosidad
+                        Temperatura*/
+                        
+                        if (rdata.table_ubicacion[i].tipo == "Sonido") {
+                            $("#td_data_sono").text(rdata.table_ubicacion[i].cumplimiento.toFixed(2) + '%');
+                            $("#td_texto_sono").text(rdata.table_ubicacion[i].cumplimiento_texto);
+                        }
+                        
+                        if (rdata.table_ubicacion[i].tipo == "Aire") {
+                            $("#td_data_aire").text(rdata.table_ubicacion[i].cumplimiento.toFixed(2) + '%');
+                            $("#td_texto_aire").text(rdata.table_ubicacion[i].cumplimiento_texto);
+                        }
+                        
+                        if (rdata.table_ubicacion[i].tipo == "Luminosidad") {
+                            $("#td_data_lumi").text(rdata.table_ubicacion[i].cumplimiento.toFixed(2) + '%');
+                            $("#td_texto_lumi").text(rdata.table_ubicacion[i].cumplimiento_texto);
+                        }
+                        
+                        if (rdata.table_ubicacion[i].tipo == "Temperatura") {
+                            $("#td_data_temp").text(rdata.table_ubicacion[i].cumplimiento.toFixed(2) + '%');
+                            $("#td_texto_temp").text(rdata.table_ubicacion[i].cumplimiento_texto);
+                        } 
+                    }                    
+
+                  /*
+                  <tr>
+                    <th scope="row">Datos</th>
+                    <td id = "td_data_aire">Dato 1</td>
+                    <td id = "td_data_temp">Dato 2</td>
+                    <td id = "td_data_lumi">Dato 3</td>
+                    <td id = "td_data_sono">Dato 4</td>
+                    <td id = "td_data_cumplimiento">0%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Cumplimiento</th>
+                    <td id="td_texto_aire">Sin procesar</td>
+                    <td id="td_texto_temp">Sin procesar</td>
+                    <td id="td_texto_lumi">Sin procesar</td>
+                    <td id="td_texto_sono">Sin procesar</td>
+                    <td id="td_texto_cumplimiento">-</td>
+                  </tr>*/
+                  
 
                   }
                 });
