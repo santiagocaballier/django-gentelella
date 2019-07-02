@@ -39,7 +39,8 @@ def set_data(request,_mac_address,_dataint,_datadec):
 def refresh_graph(request,_sensor_name):
     graph_data = {} 
     sensor = Sensor.objects.get(nombre=_sensor_name)
-    
+    header_total = 0
+    header_ultactualizacion = '00:00:00'
     
     if request.GET['start_date']:
         start_date = request.GET['start_date']
@@ -59,10 +60,13 @@ def refresh_graph(request,_sensor_name):
         for d in dq:
             data = {"datetime" : str(d.datetime.date()) + ' ' + str(d.datetime.time()) , "value" : str(d.data) , "alarma_max": str(d.alarma_value_max),"alarma_min": str(d.alarma_value_min)}
             obj.append(data)
+            header_total += 1
     else:
         data = {}
     
     graph_data.update({"data" : obj})
+    graph_data.update({"header_total" : header_total})
+    graph_data.update({"header_ultactualizacion" : datetime.now().strftime("%H:%M:%S")})
     
     #Alarma
     try:
@@ -70,6 +74,7 @@ def refresh_graph(request,_sensor_name):
         graph_data.update({"goal_max" : alarma.valor_max,"goal_min" : alarma.valor_min})
     except ObjectDoesNotExist:
         graph_data.update({"goal_max" : '',"goal_min" : ''})
+    
     
     
     #Json    
@@ -82,6 +87,10 @@ def refresh_graph(request,_sensor_name):
 def refresh_ubicacion(request,_ubicacion_name):
     confort_acum = 0.00
     confort_count = 0
+    header_total = 0
+    header_cumplidas = 0
+    header_incumplidas = 0
+    header_ultactualizacion = '00:00:00'
     
     if request.GET['start_date']:
         start_date = request.GET['start_date']
@@ -132,8 +141,13 @@ def refresh_ubicacion(request,_ubicacion_name):
                     count_total += 1
                     if d.data <= d.alarma_value_min:
                         count_invalid +=1
+                        header_incumplidas += 1
                     elif d.data >= d.alarma_value_max:
                         count_invalid +=1
+                        header_incumplidas += 1
+                    else:
+                        header_cumplidas += 1
+                    header_total += 1
    
             cumplimiento = 0
             cumplimiento_texto = 'SIN DATOS'
@@ -205,7 +219,10 @@ def refresh_ubicacion(request,_ubicacion_name):
     
     jssensores.update({"table_ubicacion" : obj_datos})
     jssensores.update({"data_confort" : data_confort})
-    
+    jssensores.update({"header_total" : header_total})
+    jssensores.update({"header_cumplidas" : header_cumplidas})
+    jssensores.update({"header_incumplidas" : header_incumplidas})
+    jssensores.update({"header_ultactualizacion" : datetime.now().strftime("%H:%M:%S")})
     
     #Json    
     table_data = json.dumps(jssensores)
