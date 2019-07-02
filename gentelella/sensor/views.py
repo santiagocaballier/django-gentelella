@@ -26,7 +26,8 @@ def set_data(request,_mac_address,_dataint,_datadec):
         dsen.datetime = datetime.now()
         dsen.sensor = _sensor
         if qalarma:
-            dsen.alarma_value = qalarma.valor
+            dsen.alarma_value_max = qalarma.valor_max
+            dsen.alarma_value_min = qalarma.valor_min
         
         dsen.save()
         print(dsen)
@@ -56,7 +57,7 @@ def refresh_graph(request,_sensor_name):
     obj = []
     if dq:
         for d in dq:
-            data = {"datetime" : str(d.datetime.date()) + ' ' + str(d.datetime.time()) , "value" : str(d.data) , "alarma": str(d.alarma_value)}
+            data = {"datetime" : str(d.datetime.date()) + ' ' + str(d.datetime.time()) , "value" : str(d.data) , "alarma_max": str(d.alarma_value_max),"alarma_min": str(d.alarma_value_min)}
             obj.append(data)
     else:
         data = {}
@@ -66,9 +67,9 @@ def refresh_graph(request,_sensor_name):
     #Alarma
     try:
         alarma = Alarma.objects.get(sensor = sensor)
-        graph_data.update({"goals" : alarma.valor})
+        graph_data.update({"goal_max" : alarma.valor_max,"goal_min" : alarma.valor_min})
     except ObjectDoesNotExist:
-        graph_data.update({"goals" : ''})
+        graph_data.update({"goal_max" : '',"goal_min" : ''})
     
     
     #Json    
@@ -79,6 +80,9 @@ def refresh_graph(request,_sensor_name):
     return JsonResponse(graph_data,safe=False)
 
 def refresh_ubicacion(request,_ubicacion_name):
+    confort_acum = 0.00
+    confort_count = 0
+    
     if request.GET['start_date']:
         start_date = request.GET['start_date']
     else:
@@ -116,16 +120,19 @@ def refresh_ubicacion(request,_ubicacion_name):
     dqsensor = Sensor.objects.filter(ubicacion__nombre = _ubicacion_name)
         
     if dqsensor:
+        #Cada sensor
         for s in dqsensor:
             count_total = 0.00
             count_invalid = 0.00
             
             dq = DataSensor.objects.filter(sensor = s, datetime__range=(start_date, end_date))
-
+            #Cada data en sensor
             if dq:
                 for d in dq:
                     count_total += 1
-                    if d.data < d.alarma_value:
+                    if d.data <= d.alarma_value_min:
+                        count_invalid +=1
+                    elif d.data >= d.alarma_value_max:
                         count_invalid +=1
    
             cumplimiento = 0
@@ -143,36 +150,62 @@ def refresh_ubicacion(request,_ubicacion_name):
             data_aire = {}
             data_luminosidad = {}
             data_temperatura = {}
+            data_confort = {}
             
             if s.tipo.tipo == "Sonido":
                 data_sonido = {"tipo" : "Sonido" , "cumplimiento" : cumplimiento,"cumplimiento_texto":cumplimiento_texto}
                 print(count_total)
                 print(data_sonido)
                 obj_datos.append(data_sonido)
+                #Armo el cumplimiento
+                if cumplimiento_texto != 'SIN DATOS':
+                    confort_acum = confort_acum + cumplimiento
+                    confort_count = confort_count + 1
                 
             if s.tipo.tipo == "Aire":
                 data_aire  = {"tipo" : "Aire" , "cumplimiento" : cumplimiento,"cumplimiento_texto":cumplimiento_texto}
                 print(cumplimiento_texto)
                 print(data_aire)
                 obj_datos.append(data_aire)
+                #Armo el cumplimiento
+                if cumplimiento_texto != 'SIN DATOS':
+                    confort_acum = confort_acum + cumplimiento
+                    confort_count = confort_count + 1
             
             if s.tipo.tipo  == "Luminosidad":
                 data_luminosidad = {"tipo" : "Luminosidad" , "cumplimiento" : cumplimiento,"cumplimiento_texto":cumplimiento_texto}
                 print(count_total)
                 print(data_luminosidad)
                 obj_datos.append(data_luminosidad)
+                #Armo el cumplimiento
+                if cumplimiento_texto != 'SIN DATOS':
+                    confort_acum = confort_acum + cumplimiento
+                    confort_count = confort_count + 1
                 
             if s.tipo.tipo  == "Temperatura":
                 data_temperatura = {"tipo" : "Temperatura" , "cumplimiento" : cumplimiento,"cumplimiento_texto":cumplimiento_texto}
                 print(count_total)
                 print(data_temperatura)
                 obj_datos.append(data_temperatura)
+                #Armo el cumplimiento
+                if cumplimiento_texto != 'SIN DATOS':
+                    confort_acum = confort_acum + cumplimiento
+                    confort_count = confort_count + 1
+            
             
             #datas = {"sensor" : s.nombre, "tipo" : s.tipo.tipo ,"data":obj_data,"cumplimiento" : cumplimiento ,"cumplimiento_texto" : cumplimiento_texto, "total_muestras" : count_total}
             #obj_sensores.append(datas)
-                         
+    if confort_count > 0:
+        confort_index = (1/confort_count) * confort_acum
+        data_confort = {"confort_index" : confort_index}
+        #obj_datos.append(data_confort)
+    else:
+        data_confort = {"confort_index" : 'SIN DATOS'}
+        #obj_datos.append(data_confort)                     
     
     jssensores.update({"table_ubicacion" : obj_datos})
+    jssensores.update({"data_confort" : data_confort})
+    
     
     #Json    
     table_data = json.dumps(jssensores)

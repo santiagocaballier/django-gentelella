@@ -37,7 +37,8 @@ class Sensor(models.Model):
 
 class Alarma(models.Model):
     sensor = models.ForeignKey(Sensor,on_delete=models.CASCADE)
-    valor = models.FloatField(default=0)
+    valor_max = models.FloatField(default=0)
+    valor_min = models.FloatField(default=0)
     descripcion = models.CharField(max_length=100,default='')
     
     def __str__(self):
@@ -47,7 +48,8 @@ class DataSensor(models.Model):
     sensor =  models.ForeignKey(Sensor,on_delete=models.CASCADE)
     datetime = models.DateTimeField()
     data = models.FloatField()
-    alarma_value = models.FloatField(default=-100000)
+    alarma_value_max = models.FloatField(default=+100000)
+    alarma_value_min = models.FloatField(default=-100000)
     
     def __str__(self):
         return str(self.datetime) + ' - ' + str(self.data)

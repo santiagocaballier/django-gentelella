@@ -181,7 +181,7 @@
                      },
                   success: function(r) {
                     var rdata = JSON.parse(r);
-                    //console.log(rdata);
+                    console.log(rdata);
                     
                     $("#td_data_sono").text("");
                     $("#td_texto_sono").text("");
@@ -222,8 +222,13 @@
                         if (rdata.table_ubicacion[i].tipo == "Temperatura") {
                             $("#td_data_temp").text(rdata.table_ubicacion[i].cumplimiento.toFixed(2) + '%');
                             $("#td_texto_temp").text(rdata.table_ubicacion[i].cumplimiento_texto);
-                        } 
+                        }
                     }                    
+    
+                    if (rdata.data_confort.confort_index != "SIN DATOS") {
+                            $("#td_texto_cumplimiento").text(rdata.data_confort.confort_index.toFixed(2) + '%');
+                    }
+                    
 
                   /*
                   <tr>
